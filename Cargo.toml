@@ -1,0 +1,25 @@
+[package]
+name = "kickasstorrent"
+version = "0.1.0"
+edition = "2021"
+description = "Rust library for KickassTorrents"
+documentation = "https://docs.rs/kickasstorrent"
+readme = "README.md"
+repository = "https://github.com/tsirysndr/kickasstorrent"
+license = "MIT"
+authors = ["Tsiry Sandratraina <tsiry.sndr@aol.com>"]
+categories = ["command-line-utilities"]
+keywords = ["tokio", "torrent", "cli", "kickasstorrents"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "3.2.17"
+colored_json = "2.1.0"
+const_format = "0.2.26"
+scraper = "0.13.0"
+serde = "1.0.143"
+serde_json = "1.0.83"
+surf = "2.3.2"
+tokio = { version = "1.20.1", features = ["full"] }
+urlencoding = "2.1.0"
