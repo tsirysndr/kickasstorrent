@@ -7,5 +7,5 @@ KickassTorrents CLI is a command line interface and Rust library for KickassTorr
 ## Installation
 
 ```bash
-cargo install katcli
+cargo install kickasstorrent
 ```
