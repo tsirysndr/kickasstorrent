@@ -4,6 +4,8 @@ use kickasstorrent::{
     parser::Parser,
     types::{PopularOptions, SearchOptions},
 };
+use owo_colors::OwoColorize;
+use tabled::{builder::Builder, Style};
 use urlencoding::encode;
 
 fn cli() -> Command<'static> {
@@ -159,7 +161,12 @@ async fn main() -> Result<(), surf::Error> {
         Some(("latest", _)) => format_results(parser.get_latest().await?),
         Some(("latest-searches", _)) => {
             let result = parser.get_latest_searches().await?;
-            result.iter().for_each(|r| println!("{}", r));
+            let mut builder = Builder::default();
+            builder.set_columns(vec!["Latest Searches".green().to_string()]);
+            result.iter().for_each(|search| {
+                builder.add_record(vec![search.to_string()]);
+            });
+            println!("\n{}", builder.build().with(Style::psql()));
             return Ok(());
         }
         Some(("popular", sub_matches)) => {
