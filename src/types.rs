@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Torrent {
+    pub id: String,
     pub name: String,
     pub size: String,
     pub uploader: String,
@@ -34,4 +35,16 @@ pub struct PopularOptions {
     pub popular_in_games: bool,
     pub popular_in_apps: bool,
     pub popular_in_other: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TorrentDetails {
+    pub id: String,
+    pub name: String,
+    pub files: Vec<String>,
+    pub magnet: String,
+    pub seeders: String,
+    pub leechers: String,
+    pub size: String,
+    pub trackers: Vec<String>,
 }

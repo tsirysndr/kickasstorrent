@@ -5,7 +5,7 @@ use surf::{Client, Config, Url};
 
 use crate::{
     constants::{ANIME, APPS, BASE_URL, DOCS, GAMES, LATEST, MOVIES, MUSIC, OTHER, TV, XXX},
-    types::{PopularOptions, SearchOptions, Torrent},
+    types::{PopularOptions, SearchOptions, Torrent, TorrentDetails},
 };
 
 pub struct Parser {
@@ -40,70 +40,100 @@ impl Parser {
     pub async fn get_latest(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(LATEST).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Latest Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_tv(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(TV).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "TV Shows Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_games(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(GAMES).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Games Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_apps(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(APPS).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Applications Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_other(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(OTHER).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Other Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_movies(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(MOVIES).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Movies Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_music(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(MUSIC).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Music Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_documentaries(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(DOCS).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Documentaries Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_anime(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(ANIME).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "Anime Torrents".to_string();
+        }
         Ok(results)
     }
 
     pub async fn get_xxx(&self) -> Result<Vec<Torrent>, surf::Error> {
         let page = self.client.get(XXX).recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = self.parse_torrents(&document);
+        let mut results = self.parse_torrents(&document);
+        for torrent in &mut results {
+            torrent.category = "XXX Torrents".to_string();
+        }
         Ok(results)
     }
 
@@ -164,6 +194,88 @@ impl Parser {
         Ok(results)
     }
 
+    pub async fn get_torrent_details(&self, id: &str) -> Result<TorrentDetails, surf::Error> {
+        let page = self
+            .client
+            .get(format!("/{}.html", id))
+            .recv_string()
+            .await?;
+        let document = Html::parse_document(&page);
+        let mut details = self.parse_torrent_details(&document);
+        details.id = id.to_string();
+        Ok(details)
+    }
+
+    fn parse_torrent_details(&self, document: &Html) -> TorrentDetails {
+        let mut torrent_details = TorrentDetails {
+            id: String::new(),
+            name: String::new(),
+            size: String::new(),
+            files: Vec::new(),
+            magnet: String::new(),
+            seeders: String::new(),
+            leechers: String::new(),
+            trackers: Vec::new(),
+        };
+
+        let selector = Selector::parse(r#"span[itemprop="name"]"#).unwrap();
+        let element = document.select(&selector).next().unwrap();
+        torrent_details.name = element
+            .text()
+            .collect::<Vec<_>>()
+            .join(" ")
+            .replace("\n", "");
+
+        let selector = Selector::parse("#torrent_files").unwrap();
+        let element = document.select(&selector).next().unwrap();
+        element
+            .select(&Selector::parse("li").unwrap())
+            .for_each(|e| {
+                let file = e.text().collect::<Vec<_>>().join(" ").replace("\n ", "");
+                torrent_details.files.push(file);
+            });
+
+        let selector = Selector::parse(r#"a[href^="magnet:"]"#).unwrap();
+        let element = document.select(&selector).next().unwrap();
+        torrent_details.magnet = element.value().attr("href").unwrap().to_string();
+
+        let selector = Selector::parse(".widgetSize").unwrap();
+        let element = document.select(&selector).next().unwrap();
+        torrent_details.size = element.text().collect::<Vec<_>>().join("");
+
+        let selector = Selector::parse(".widgetSeed").unwrap();
+        let element = document.select(&selector).next().unwrap();
+        torrent_details.seeders = element
+            .text()
+            .collect::<Vec<_>>()
+            .join("")
+            .replace("seeders:", "");
+
+        let selector = Selector::parse(".widgetLeech").unwrap();
+        let element = document.select(&selector).next().unwrap();
+        torrent_details.leechers = element
+            .text()
+            .collect::<Vec<_>>()
+            .join("")
+            .replace("leechers:", "");
+
+        let selector = Selector::parse("#trackers_table").unwrap();
+        let element = document.select(&selector).next().unwrap();
+        element
+            .select(&Selector::parse("div").unwrap())
+            .for_each(|e| {
+                let tracker = e
+                    .text()
+                    .collect::<Vec<_>>()
+                    .join(" ")
+                    .replace("\n", "")
+                    .replace(" ", "");
+                torrent_details.trackers.push(tracker);
+            });
+
+        return torrent_details;
+    }
+
     fn parse_categories(&self, document: &Html) -> Vec<String> {
         let mut categories: Vec<String> = Vec::new();
 
@@ -214,6 +326,16 @@ impl Parser {
             let mut torrent = self.parse_torrent_infos(tr);
             torrent.name = name;
             torrent.link = link;
+            torrent.id = format!(
+                "{}",
+                a.unwrap()
+                    .value()
+                    .attr("href")
+                    .unwrap()
+                    .replace("/download/", "")
+                    .replace(".html", "")
+                    .to_string()
+            );
             torrents.push(torrent);
         }
         return torrents;
@@ -249,6 +371,17 @@ impl Parser {
                     continue;
                 }
 
+                torrent.id = format!(
+                    "{}",
+                    a.unwrap()
+                        .value()
+                        .attr("href")
+                        .unwrap()
+                        .replace("/", "")
+                        .replace(".html", "")
+                        .to_string()
+                );
+
                 torrents.push(torrent);
             }
         }
@@ -257,6 +390,7 @@ impl Parser {
 
     fn parse_torrent_infos(&self, tr: ElementRef) -> Torrent {
         let mut torrent = Torrent {
+            id: String::new(),
             name: String::new(),
             size: String::new(),
             uploader: String::new(),

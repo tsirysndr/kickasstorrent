@@ -36,6 +36,7 @@ OPTIONS:
 SUBCOMMANDS:
     category           List torrents in a category
     help               Print this message or the help of the given subcommand(s)
+    info               Show information about a torrent
     latest             Show latest torrents
     latest-searches    Show latest searches
     popular            Show popular torrents

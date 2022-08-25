@@ -1,4 +1,5 @@
 use clap::{arg, Arg, ArgAction, Command};
+use colored_json::ToColoredJson;
 use kickasstorrent::{
     formater::format_results,
     parser::Parser,
@@ -131,6 +132,16 @@ Search torrents from kickasstorrents"#,
                         .action(ArgAction::SetTrue),
                 ),
         )
+        .subcommand(
+            Command::new("info")
+                .about("Show information about a torrent")
+                .arg(
+                    Arg::with_name("id")
+                        .help("The id of the torrent")
+                        .required(true)
+                        .index(1),
+                ),
+        )
 }
 
 #[tokio::main]
@@ -223,6 +234,18 @@ async fn main() -> Result<(), surf::Error> {
                 return Ok(());
             }
             format_results(parser.get_all().await?);
+        }
+        Some(("info", sub_matches)) => {
+            let id = sub_matches.get_one::<String>("id").unwrap();
+            let result = parser.get_torrent_details(&id).await?;
+            println!(
+                "{}",
+                serde_json::to_string(&result)
+                    .unwrap()
+                    .to_colored_json_auto()
+                    .unwrap()
+            );
+            return Ok(());
         }
         _ => unreachable!(),
     }
