@@ -218,6 +218,14 @@ impl Parser {
             trackers: Vec::new(),
         };
 
+        if document
+            .select(&Selector::parse("#torrent_files").unwrap())
+            .next()
+            .is_none()
+        {
+            panic!("No torrent files found");
+        }
+
         let selector = Selector::parse(r#"span[itemprop="name"]"#).unwrap();
         let element = document.select(&selector).next().unwrap();
         torrent_details.name = element
