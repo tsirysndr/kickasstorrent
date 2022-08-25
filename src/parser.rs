@@ -120,8 +120,13 @@ impl Parser {
     pub async fn get_latest_searches(&self) -> Result<Vec<String>, surf::Error> {
         let page = self.client.get("/").recv_string().await?;
         let document = Html::parse_document(&page);
-        let results = Vec::new();
-        Ok(results)
+        let selector = Selector::parse("#latestSearches").unwrap();
+        let element = document.select(&selector).next().unwrap();
+        let searches: Vec<_> = element
+            .select(&Selector::parse("p").unwrap())
+            .map(|e| e.text().collect::<Vec<_>>().join(" "))
+            .collect();
+        Ok(searches)
     }
 
     pub async fn get_popular(&self, options: &PopularOptions) -> Result<Vec<Torrent>, surf::Error> {

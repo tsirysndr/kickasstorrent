@@ -158,7 +158,8 @@ async fn main() -> Result<(), surf::Error> {
         }
         Some(("latest", _)) => format_results(parser.get_latest().await?),
         Some(("latest-searches", _)) => {
-            parser.get_latest_searches().await?;
+            let result = parser.get_latest_searches().await?;
+            result.iter().for_each(|r| println!("{}", r));
             return Ok(());
         }
         Some(("popular", sub_matches)) => {
