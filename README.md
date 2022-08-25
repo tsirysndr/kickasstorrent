@@ -21,3 +21,24 @@ KickassTorrents CLI is a command line interface and Rust library for KickassTorr
 ```bash
 cargo install kickasstorrent
 ```
+
+## Usage
+
+```
+
+USAGE:
+    kickasstorrent <SUBCOMMAND>
+
+OPTIONS:
+    -h, --help       Print help information
+    -V, --version    Print version information
+
+SUBCOMMANDS:
+    category           List torrents in a category
+    help               Print this message or the help of the given subcommand(s)
+    latest             Show latest torrents
+    latest-searches    Show latest searches
+    popular            Show popular torrents
+    search             Search for torrents
+
+```
