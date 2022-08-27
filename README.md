@@ -4,6 +4,9 @@
   <a href="https://crates.io/crates/kickasstorrent" target="_blank">
     <img src="https://img.shields.io/crates/v/kickasstorrent.svg" />
   </a>
+   <a href="https://crates.io/crates/kickasstorrent" target="_blank">
+    <img src="https://img.shields.io/crates/dr/kickasstorrent" />
+  </a>
   <a href="https://docs.rs/kickasstorrent" target="_blank">
     <img src="https://docs.rs/kickasstorrent/badge.svg" />
   </a>
