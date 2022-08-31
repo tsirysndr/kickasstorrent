@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use tabled::Tabled;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Tabled)]
 pub struct Torrent {
     pub id: String,
     pub name: String,
@@ -9,7 +10,9 @@ pub struct Torrent {
     pub age: String,
     pub seed: String,
     pub leech: String,
+    #[tabled(skip)]
     pub link: String,
+    #[tabled(skip)]
     pub category: String,
 }
 

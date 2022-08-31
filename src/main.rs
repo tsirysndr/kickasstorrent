@@ -142,12 +142,15 @@ Search torrents from kickasstorrents"#,
                         .index(1),
                 ),
         )
+        .arg(arg!(-j --json ... "Output results in json format").required(false))
 }
 
 #[tokio::main]
 async fn main() -> Result<(), surf::Error> {
     let matches = cli().get_matches();
     let parser = Parser::new();
+
+    let json = matches.is_present("json");
 
     match matches.subcommand() {
         Some(("search", sub_matches)) => {
@@ -167,9 +170,9 @@ async fn main() -> Result<(), surf::Error> {
                 search_in_anime: *sub_matches.get_one::<bool>("anime").unwrap_or(&false),
             };
 
-            format_results(parser.search(&query, &options).await?);
+            format_results(parser.search(&query, &options).await?, json);
         }
-        Some(("latest", _)) => format_results(parser.get_latest().await?),
+        Some(("latest", _)) => format_results(parser.get_latest().await?, json),
         Some(("latest-searches", _)) => {
             let result = parser.get_latest_searches().await?;
             let mut builder = Builder::default();
@@ -194,46 +197,46 @@ async fn main() -> Result<(), surf::Error> {
                     .unwrap_or(&false),
                 popular_in_xxx: *sub_matches.get_one::<bool>("xxx").unwrap_or(&false),
             };
-            format_results(parser.get_popular(&options).await?);
+            format_results(parser.get_popular(&options).await?, json);
         }
         Some(("category", sub_matches)) => {
             if *sub_matches.get_one::<bool>("new").unwrap() {
-                format_results(parser.get_latest().await?);
+                format_results(parser.get_latest().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("tv").unwrap() {
-                format_results(parser.get_tv().await?);
+                format_results(parser.get_tv().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("games").unwrap() {
-                format_results(parser.get_games().await?);
+                format_results(parser.get_games().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("apps").unwrap() {
-                format_results(parser.get_apps().await?);
+                format_results(parser.get_apps().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("other").unwrap() {
-                format_results(parser.get_other().await?);
+                format_results(parser.get_other().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("movies").unwrap() {
-                format_results(parser.get_movies().await?);
+                format_results(parser.get_movies().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("music").unwrap() {
-                format_results(parser.get_music().await?);
+                format_results(parser.get_music().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("documentaries").unwrap() {
-                format_results(parser.get_documentaries().await?);
+                format_results(parser.get_documentaries().await?, json);
                 return Ok(());
             }
             if *sub_matches.get_one::<bool>("xxx").unwrap() {
-                format_results(parser.get_xxx().await?);
+                format_results(parser.get_xxx().await?, json);
                 return Ok(());
             }
-            format_results(parser.get_all().await?);
+            format_results(parser.get_all().await?, json);
         }
         Some(("info", sub_matches)) => {
             let id = sub_matches.get_one::<String>("id").unwrap();
