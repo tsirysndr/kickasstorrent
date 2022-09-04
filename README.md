@@ -16,6 +16,9 @@
   <a href="https://github.com/tsirysndr/kickasstorrent/actions/workflows/release.yml" target="_blank">
     <img alt="License: MIT" src="https://github.com/tsirysndr/kickasstorrent/actions/workflows/release.yml/badge.svg" />
   </a>
+  <a href="https://github.com/tsirysndr/kickasstorrent/actions/workflows/rust-clippy.yml" target="_blank">
+    <img alt="release" src="https://github.com/tsirysndr/kickasstorrent/actions/workflows/rust-clippy.yml/badge.svg?branch=master" />
+  </a>
 </p>
 
 KickassTorrents CLI is a command line interface and Rust library for KickassTorrents.
